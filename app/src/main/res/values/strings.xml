@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Alligator vs Crocodile Classifier</string>
+
+    <string name="classification_title">Alligator vs Crocodile</string>
+    <string name="camera_button">Camera</string>
+    <string name="gallery_button">Gallery</string>
+    <string name="selected_image">Selected image</string>
+    <string name="read_for_details_button">Read for details</string>
+    <string name="select_button">Select</string>
+    <string name="no_image_selected_text">No image selected</string>
+    <string name="info_button">Info</string>
+</resources>
