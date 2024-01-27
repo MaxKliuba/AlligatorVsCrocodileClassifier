@@ -1,12 +1,23 @@
 <resources>
     <string name="app_name">Alligator vs Crocodile Classifier</string>
 
+    <string name="alligator_label">Alligator</string>
+    <string name="crocodile_label">Crocodile</string>
+    <string name="unknown_label">Unknown</string>
+    <string name="alligator_details">https://en.wikipedia.org/wiki/Alligator</string>
+    <string name="crocodile_details">https://en.wikipedia.org/wiki/Crocodile</string>
+    <string name="unknown_details">https://en.wikipedia.org/wiki/Chupacabra</string>
+
     <string name="classification_title">Alligator vs Crocodile</string>
+    <string name="info_button">Info</string>
     <string name="camera_button">Camera</string>
     <string name="gallery_button">Gallery</string>
-    <string name="selected_image">Selected image</string>
-    <string name="read_for_details_button">Read for details</string>
     <string name="select_button">Select</string>
     <string name="no_image_selected_text">No image selected</string>
-    <string name="info_button">Info</string>
+    <string name="selected_image">Selected image</string>
+    <string name="image_loading_error_message">Failed to load image.</string>
+    <string name="retry_button">Retry</string>
+    <string name="read_for_details_button">Read for details</string>
+    <string name="classification_error_text">Classification Error</string>
+    <string name="try_again_button">Try again</string>
 </resources>

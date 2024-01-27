@@ -1,6 +1,10 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    // KSP
+    id("com.google.devtools.ksp")
+    // Hilt
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -12,7 +16,7 @@ android {
         minSdk = 23
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -22,7 +26,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -70,6 +74,16 @@ dependencies {
     // Compose
     implementation("androidx.compose.material:material-icons-extended")
 
+    // Hilt
+    val hiltVersion = "2.48.1"
+    implementation("com.google.dagger:hilt-android:$hiltVersion")
+    ksp("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+
     // Coil
     implementation("io.coil-kt:coil-compose:2.4.0")
+
+    // Tensorflow Lite
+    implementation("org.tensorflow:tensorflow-lite-task-vision:0.4.2")
+    implementation("com.google.android.gms:play-services-tflite-gpu:16.2.0")
 }

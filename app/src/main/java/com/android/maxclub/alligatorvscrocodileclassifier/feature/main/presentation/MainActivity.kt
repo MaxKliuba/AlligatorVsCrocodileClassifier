@@ -9,7 +9,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.android.maxclub.alligatorvscrocodileclassifier.feature.classification.presentation.ClassificationScreen
 import com.android.maxclub.alligatorvscrocodileclassifier.ui.theme.AlligatorVsCrocodileClassifierTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

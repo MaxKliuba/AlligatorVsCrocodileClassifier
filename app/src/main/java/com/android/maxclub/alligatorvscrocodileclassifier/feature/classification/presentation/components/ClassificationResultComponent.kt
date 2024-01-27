@@ -20,11 +20,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.android.maxclub.alligatorvscrocodileclassifier.R
+import com.android.maxclub.alligatorvscrocodileclassifier.feature.classification.domain.ClassificationResult
 
 @Composable
-fun ResultSection(
-    result: Float,
-    onClickReadForDetails: () -> Unit,
+fun ClassificationResultComponent(
+    result: ClassificationResult,
+    onReadForDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -34,13 +35,13 @@ fun ResultSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Crocodile",
+                    text = stringResource(id = result.label),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(start = 16.dp, top = 16.dp)
                 )
                 TextButton(
-                    onClick = onClickReadForDetails,
+                    onClick = onReadForDetails,
                     modifier = Modifier.padding(4.dp)
                 ) {
                     Text(text = stringResource(R.string.read_for_details_button))
@@ -52,12 +53,12 @@ fun ResultSection(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = (result * 100).toInt().toString(),
+                    text = (result.score * 100).toInt().toString(),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                 )
                 CircularProgressIndicator(
-                    progress = result,
+                    progress = result.score,
                     strokeWidth = 6.dp,
                     strokeCap = StrokeCap.Round,
                     modifier = Modifier.size(64.dp)

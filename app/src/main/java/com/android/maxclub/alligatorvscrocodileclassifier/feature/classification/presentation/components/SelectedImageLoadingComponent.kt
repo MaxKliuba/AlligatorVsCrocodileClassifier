@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SelectedImageLoadingIndicator(modifier: Modifier = Modifier) {
+fun SelectedImageLoadingComponent(modifier: Modifier = Modifier) {
     CircularProgressIndicator(
         strokeWidth = 6.dp,
         strokeCap = StrokeCap.Round,
