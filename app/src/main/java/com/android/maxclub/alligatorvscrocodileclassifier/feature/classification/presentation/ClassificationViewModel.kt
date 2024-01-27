@@ -1,6 +1,8 @@
 package com.android.maxclub.alligatorvscrocodileclassifier.feature.classification.presentation
 
 import android.graphics.drawable.Drawable
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,15 +28,22 @@ class ClassificationViewModel @Inject constructor(
     val uiAction = uiActionChannel.receiveAsFlow()
 
     fun openCamera() {
-        _uiState.update { ClassificationUiState.NoImage }
-    }
-
-    fun openGallery() {
         loadImage("https://upload.wikimedia.org/wikipedia/commons/2/29/Pangil_Crocodile_Park_Davao_City.jpg")
     }
 
+    fun openGallery() {
+        uiActionChannel.sendIn(
+            ClassificationUiAction.RequestImagePickerLauncher(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            ),
+            viewModelScope
+        )
+    }
+
     fun loadImage(imageUrl: String) {
-        _uiState.update { ClassificationUiState.ImageSelected.Loading(imageUrl) }
+        if ((_uiState.value as? ClassificationUiState.ImageSelected)?.imageUrl != imageUrl) {
+            _uiState.update { ClassificationUiState.ImageSelected.Loading(imageUrl) }
+        }
     }
 
     fun onImageLoaded(imageUrl: String, image: Drawable) {

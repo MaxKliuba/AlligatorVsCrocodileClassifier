@@ -1,13 +1,17 @@
 package com.android.maxclub.alligatorvscrocodileclassifier.feature.classification.presentation
 
 import android.content.res.Configuration
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -18,11 +22,17 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.maxclub.alligatorvscrocodileclassifier.R
@@ -39,11 +49,19 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
     val state by viewModel.uiState
+    var parentSize by remember { mutableStateOf(IntSize.Zero) }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
+    val density = LocalDensity.current
+
+    val imagePickerResultLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { imageUri ->
+        imageUri?.let { viewModel.loadImage(imageUri.toString()) }
+    }
 
     LaunchedEffect(true) {
         viewModel.uiAction.collectLatest { action ->
@@ -60,6 +78,10 @@ fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
                         }
                     }
                 }
+
+                is ClassificationUiAction.RequestImagePickerLauncher -> {
+                    imagePickerResultLauncher.launch(action.imagePickerRequest)
+                }
             }
         }
     }
@@ -70,8 +92,8 @@ fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
         },
         floatingActionButton = {
             SelectImageFab(
-                onOpenCamera = viewModel::openCamera,
                 onOpenGallery = viewModel::openGallery,
+                onOpenCamera = viewModel::openCamera,
             )
         },
         snackbarHost = {
@@ -90,6 +112,7 @@ fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .onSizeChanged { parentSize = it }
         ) {
             state.let { state ->
                 when (state) {
@@ -109,8 +132,10 @@ fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
                                         imageUrl = state.imageUrl,
                                         onSuccess = viewModel::onImageLoaded,
                                         onError = viewModel::onImageLoadingError,
+                                        contentScale = ContentScale.FillHeight,
                                         modifier = Modifier
                                             .fillMaxHeight()
+                                            .widthIn(max = with(density) { parentSize.width.toDp() * 0.65f })
                                             .padding(
                                                 start = 16.dp,
                                                 top = 16.dp,
@@ -164,13 +189,15 @@ fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
                                         imageUrl = state.imageUrl,
                                         onSuccess = viewModel::onImageLoaded,
                                         onError = viewModel::onImageLoadingError,
+                                        contentScale = ContentScale.FillWidth,
                                         modifier = Modifier
                                             .fillMaxWidth()
+                                            .heightIn(max = with(density) { parentSize.height.toDp() * 0.65f })
                                             .padding(16.dp)
                                     )
 
                                     val classificationResultModifier =
-                                        Modifier.padding(horizontal = 16.dp)
+                                        Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
 
                                     when (state) {
                                         is ClassificationUiState.ImageSelected.Classifying -> {

@@ -20,8 +20,8 @@ import com.android.maxclub.alligatorvscrocodileclassifier.R
 
 @Composable
 fun SelectImageFab(
-    onOpenCamera: () -> Unit,
     onOpenGallery: () -> Unit,
+    onOpenCamera: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -29,13 +29,13 @@ fun SelectImageFab(
         modifier = modifier
     ) {
         SmallFloatingActionButton(
-            onClick = onOpenCamera,
+            onClick = onOpenGallery,
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             Icon(
-                imageVector = Icons.Default.PhotoCamera,
-                contentDescription = stringResource(R.string.camera_button)
+                imageVector = Icons.Default.Photo,
+                contentDescription = stringResource(R.string.gallery_button)
             )
         }
 
@@ -44,14 +44,14 @@ fun SelectImageFab(
         ExtendedFloatingActionButton(
             icon = {
                 Icon(
-                    imageVector = Icons.Default.Photo,
-                    contentDescription = stringResource(R.string.gallery_button)
+                    imageVector = Icons.Default.PhotoCamera,
+                    contentDescription = stringResource(R.string.camera_button)
                 )
             },
             text = {
                 Text(text = stringResource(R.string.select_button))
             },
-            onClick = onOpenGallery
+            onClick = onOpenCamera
         )
     }
 }

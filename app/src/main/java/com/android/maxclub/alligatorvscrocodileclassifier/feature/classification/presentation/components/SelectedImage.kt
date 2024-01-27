@@ -16,12 +16,13 @@ fun SelectedImage(
     imageUrl: String,
     onSuccess: (String, Drawable) -> Unit,
     onError: (String) -> Unit,
+    contentScale: ContentScale,
     modifier: Modifier = Modifier
 ) {
     AsyncImage(
         model = imageUrl,
         contentDescription = stringResource(R.string.selected_image),
-        contentScale = ContentScale.Fit,
+        contentScale = contentScale,
         onSuccess = {
             onSuccess(imageUrl, it.result.drawable)
         },
