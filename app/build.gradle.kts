@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.android.maxclub.alligatorvscrocodileclassifier"
+    namespace = "com.tech.maxclub.alligatorvscrocodileclassifier"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.android.maxclub.alligatorvscrocodileclassifier"
+        applicationId = "com.tech.maxclub.alligatorvscrocodileclassifier"
         minSdk = 23
         targetSdk = 34
         versionCode = 1
