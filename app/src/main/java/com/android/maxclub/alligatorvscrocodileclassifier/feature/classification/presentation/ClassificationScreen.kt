@@ -1,5 +1,8 @@
 package com.android.maxclub.alligatorvscrocodileclassifier.feature.classification.presentation
 
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,8 +37,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.maxclub.alligatorvscrocodileclassifier.R
+import com.android.maxclub.alligatorvscrocodileclassifier.feature.classification.presentation.components.CameraPermissionRationaleDialog
 import com.android.maxclub.alligatorvscrocodileclassifier.feature.classification.presentation.components.ClassificationErrorComponent
 import com.android.maxclub.alligatorvscrocodileclassifier.feature.classification.presentation.components.ClassificationResultComponent
 import com.android.maxclub.alligatorvscrocodileclassifier.feature.classification.presentation.components.ClassificationResultLoadingComponent
@@ -49,6 +55,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
     val state by viewModel.uiState
+    val isCameraPermissionRationaleDialogVisible by viewModel.isCameraPermissionRationaleDialogVisible
     var parentSize by remember { mutableStateOf(IntSize.Zero) }
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -60,7 +67,25 @@ fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
     val imagePickerResultLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { imageUri ->
-        imageUri?.let { viewModel.loadImage(imageUri.toString()) }
+        imageUri?.let { viewModel.loadImageByUrl(imageUri.toString()) }
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { isSuccess ->
+        if (isSuccess) {
+            viewModel.loadCapturedImage()
+        }
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.capturedImageUri?.let { imageUri ->
+                cameraLauncher.launch(imageUri)
+            }
+        }
     }
 
     LaunchedEffect(true) {
@@ -74,7 +99,7 @@ fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
                         duration = SnackbarDuration.Short,
                     ).let { result ->
                         if (result == SnackbarResult.ActionPerformed) {
-                            viewModel.loadImage(action.imageUrl)
+                            viewModel.loadImageByUrl(action.imageUrl)
                         }
                     }
                 }
@@ -82,8 +107,46 @@ fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
                 is ClassificationUiAction.RequestImagePickerLauncher -> {
                     imagePickerResultLauncher.launch(action.imagePickerRequest)
                 }
+
+                is ClassificationUiAction.RequestCameraLauncher -> {
+                    val isCameraAvailable =
+                        context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+                    val cameraPermission = Manifest.permission.CAMERA
+
+                    when {
+                        !isCameraAvailable -> {
+                            snackbarHostState.showSnackbar(
+                                message = context.getString(R.string.camera_is_unavailable_message),
+                                withDismissAction = true,
+                                duration = SnackbarDuration.Short,
+                            )
+                        }
+
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            cameraPermission
+                        ) == PackageManager.PERMISSION_GRANTED -> {
+                            cameraLauncher.launch(action.imageUri)
+                        }
+
+                        ActivityCompat.shouldShowRequestPermissionRationale(
+                            context as Activity,
+                            cameraPermission
+                        ) -> {
+                            viewModel.showCameraPermissionRationaleDialog()
+                        }
+
+                        else -> {
+                            cameraPermissionLauncher.launch(cameraPermission)
+                        }
+                    }
+                }
             }
         }
+    }
+
+    if (isCameraPermissionRationaleDialogVisible) {
+        CameraPermissionRationaleDialog(onDismiss = viewModel::dismissCameraPermissionRationaleDialog)
     }
 
     Scaffold(
@@ -93,7 +156,7 @@ fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
         floatingActionButton = {
             SelectImageFab(
                 onOpenGallery = viewModel::openGallery,
-                onOpenCamera = viewModel::openCamera,
+                onOpenCamera = { viewModel.openCamera(context) },
             )
         },
         snackbarHost = {
@@ -197,7 +260,11 @@ fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
                                     )
 
                                     val classificationResultModifier =
-                                        Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                                        Modifier.padding(
+                                            start = 16.dp,
+                                            end = 16.dp,
+                                            bottom = 16.dp
+                                        )
 
                                     when (state) {
                                         is ClassificationUiState.ImageSelected.Classifying -> {
