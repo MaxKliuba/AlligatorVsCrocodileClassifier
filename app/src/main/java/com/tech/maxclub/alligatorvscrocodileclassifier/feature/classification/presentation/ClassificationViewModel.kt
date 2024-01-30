@@ -7,6 +7,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.FileProvider
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tech.maxclub.alligatorvscrocodileclassifier.BuildConfig
@@ -102,9 +103,7 @@ class ClassificationViewModel @Inject constructor(
             val newUiState = try {
                 ClassificationUiState.ImageSelected.ClassificationSuccess(
                     imageUrl = imageUrl,
-                    result = alligatorCrocodileClassifier.classify(
-                        alligatorCrocodileClassifier.convertToBitmap(image)
-                    ),
+                    result = alligatorCrocodileClassifier.classify(image.toBitmap()),
                 )
             } catch (e: ClassificationException) {
                 e.printStackTrace()
