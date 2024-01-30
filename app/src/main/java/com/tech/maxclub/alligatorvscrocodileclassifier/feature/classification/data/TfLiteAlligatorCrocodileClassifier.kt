@@ -11,55 +11,61 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.tensorflow.lite.support.image.ImageProcessor
-import org.tensorflow.lite.support.image.TensorImage
-import org.tensorflow.lite.task.core.vision.ImageProcessingOptions
-import org.tensorflow.lite.task.vision.classifier.ImageClassifier
+import org.tensorflow.lite.Interpreter
+import java.io.FileInputStream
 import java.io.IOException
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.channels.FileChannel
 import javax.inject.Inject
 
 class TfLiteAlligatorCrocodileClassifier @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : AlligatorCrocodileClassifier {
 
-    private var classifier: ImageClassifier? = null
+    private var interpreter: Interpreter? = null
 
     @Throws(IOException::class)
-    private fun setupClassifier() {
-//        val optionsBuilder = ImageClassifier.ImageClassifierOptions.builder()
-//            .setScoreThreshold(.5f)
-//            .setMaxResults(1)
-//
-//        classifier =
-//            ImageClassifier.createFromFileAndOptions(context, MODEL_PATH, optionsBuilder.build())
+    private fun setupInterpreter() {
+        val fileDescriptor = context.assets.openFd(MODEL_PATH)
+        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+        val modelBuffer = inputStream.channel.map(
+            FileChannel.MapMode.READ_ONLY,
+            fileDescriptor.startOffset,
+            fileDescriptor.declaredLength
+        )
+
+        interpreter = Interpreter(modelBuffer)
     }
 
     @Throws(ClassificationException::class)
     override suspend fun classify(bitmap: Bitmap): ClassificationResult =
         withContext(Dispatchers.IO) {
             try {
-                if (classifier == null) {
-                    setupClassifier()
+                if (interpreter == null) {
+                    setupInterpreter()
                 }
 
-                val imageProcessor = ImageProcessor.Builder().build()
-                val tensorImage = imageProcessor.process(TensorImage.fromBitmap(bitmap))
+                val inputBuffer = preprocessImage(bitmap)
+                val outputBuffer = ByteBuffer.allocateDirect(
+                    OUTPUT_DTYPE_SIZE * TFLiteClassificationResult.entries.size
+                )
+                outputBuffer.order(ByteOrder.nativeOrder())
 
-                val imageProcessingOptions = ImageProcessingOptions.builder()
-                    .setOrientation(ImageProcessingOptions.Orientation.RIGHT_TOP)
-                    .build()
+                if (interpreter != null) {
+                    interpreter?.run(inputBuffer, outputBuffer)
 
-                val results = classifier?.classify(tensorImage, imageProcessingOptions)
+                    outputBuffer.rewind()
+                    val scores = FloatArray(TFLiteClassificationResult.entries.size)
+                    outputBuffer.asFloatBuffer().get(scores)
 
-                results?.flatMap { classifications ->
-                    classifications.categories.map { category ->
-                        when (category.label) {
-                            ALLIGATOR_LABEL -> ClassificationResult.Alligator(category.score)
-                            CROCODILE_LABEL -> ClassificationResult.Crocodile(category.score)
-                            else -> ClassificationResult.Unknown(category.score)
-                        }
-                    }
-                }?.firstOrNull() ?: ClassificationResult.Unknown(1f)
+                    val index = scores.indices.maxBy { scores[it] }
+                    val score = scores[index]
+
+                    TFLiteClassificationResult.entries[index].toClassificationResult(score)
+                } else {
+                    throw ClassificationException("The model is not configured.")
+                }
             } catch (e: Exception) {
                 throw if (e is CancellationException) {
                     e
@@ -76,13 +82,32 @@ class TfLiteAlligatorCrocodileClassifier @Inject constructor(
             height = BITMAP_HEIGHT_PX,
         ).copy(Bitmap.Config.ARGB_8888, false)
 
+    private fun preprocessImage(bitmap: Bitmap): ByteBuffer {
+        val byteBuffer = ByteBuffer.allocateDirect(
+            OUTPUT_DTYPE_SIZE * BITMAP_WIDTH_PX * BITMAP_HEIGHT_PX * IMG_CHANNELS
+        )
+        byteBuffer.order(ByteOrder.nativeOrder())
+        byteBuffer.rewind()
+
+        val pixels = IntArray(BITMAP_WIDTH_PX * BITMAP_HEIGHT_PX)
+        bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+
+        for (pixelValue in pixels) {
+            byteBuffer.putFloat((pixelValue shr 16 and 0xFF) * (1.0f / 255))
+            byteBuffer.putFloat((pixelValue shr 8 and 0xFF) * (1.0f / 255))
+            byteBuffer.putFloat((pixelValue and 0xFF) * (1.0f / 255))
+        }
+
+        return byteBuffer
+    }
+
     companion object {
-        private const val MODEL_PATH = "model.tflite"
+        private const val MODEL_PATH = "alligator-vs-crocodile.tflite"
 
-        private const val BITMAP_WIDTH_PX = 100
-        private const val BITMAP_HEIGHT_PX = 100
+        private const val BITMAP_WIDTH_PX = 224
+        private const val BITMAP_HEIGHT_PX = 224
 
-        private const val ALLIGATOR_LABEL = "0"
-        private const val CROCODILE_LABEL = "1"
+        private const val IMG_CHANNELS = 3
+        private const val OUTPUT_DTYPE_SIZE = 4
     }
 }

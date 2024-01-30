@@ -13,7 +13,4 @@ sealed class ClassificationResult(
 
     class Crocodile(score: Float) :
         ClassificationResult(score, R.string.crocodile_label, R.string.crocodile_details)
-
-    class Unknown(score: Float) :
-        ClassificationResult(score, R.string.unknown_label, R.string.unknown_details)
 }

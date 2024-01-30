@@ -53,7 +53,6 @@ class ClassificationViewModel @Inject constructor(
             context.createImageFile()
         )
         capturedImageUri = imageUri
-        println(imageUri)
 
         uiActionChannel.sendIn(
             ClassificationUiAction.RequestCameraLauncher(imageUri),
