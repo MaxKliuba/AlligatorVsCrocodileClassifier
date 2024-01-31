@@ -3,13 +3,12 @@
 
     <string name="alligator_label">Alligator</string>
     <string name="crocodile_label">Crocodile</string>
-    <string name="unknown_label">Unknown</string>
     <string name="alligator_details">https://en.wikipedia.org/wiki/Alligator</string>
     <string name="crocodile_details">https://en.wikipedia.org/wiki/Crocodile</string>
-    <string name="unknown_details">https://en.wikipedia.org/wiki/Chupacabra</string>
 
     <string name="classification_title">Alligator vs Crocodile</string>
     <string name="info_button">Info</string>
+    <string name="info_details">https://en.wikipedia.org/wiki/Crocodilia</string>
     <string name="camera_button">Camera</string>
     <string name="gallery_button">Gallery</string>
     <string name="select_button">Select</string>

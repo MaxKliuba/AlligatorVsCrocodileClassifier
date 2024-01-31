@@ -53,7 +53,10 @@ import com.tech.maxclub.alligatorvscrocodileclassifier.feature.classification.pr
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
+fun ClassificationScreen(
+    onNavigateToScreenByUrl: (String) -> Unit,
+    viewModel: ClassificationViewModel = hiltViewModel(),
+) {
     val state by viewModel.uiState
     val isCameraPermissionRationaleDialogVisible by viewModel.isCameraPermissionRationaleDialogVisible
     var parentSize by remember { mutableStateOf(IntSize.Zero) }
@@ -151,7 +154,7 @@ fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
 
     Scaffold(
         topBar = {
-            ClassificationTopAppBar(onClickInfo = { /*TODO*/ })
+            ClassificationTopAppBar(onClickInfo = onNavigateToScreenByUrl)
         },
         floatingActionButton = {
             SelectImageFab(
@@ -224,7 +227,7 @@ fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
                                         is ClassificationUiState.ImageSelected.ClassificationSuccess -> {
                                             ClassificationResultComponent(
                                                 result = state.result,
-                                                onReadForDetails = { /*TODO*/ },
+                                                onReadForDetails = onNavigateToScreenByUrl,
                                                 modifier = classificationResultModifier
                                             )
                                         }
@@ -276,7 +279,7 @@ fun ClassificationScreen(viewModel: ClassificationViewModel = hiltViewModel()) {
                                         is ClassificationUiState.ImageSelected.ClassificationSuccess -> {
                                             ClassificationResultComponent(
                                                 result = state.result,
-                                                onReadForDetails = { /*TODO*/ },
+                                                onReadForDetails = onNavigateToScreenByUrl,
                                                 modifier = classificationResultModifier
                                             )
                                         }
