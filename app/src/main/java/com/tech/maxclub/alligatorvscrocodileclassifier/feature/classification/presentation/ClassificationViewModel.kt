@@ -38,6 +38,10 @@ class ClassificationViewModel @Inject constructor(
     var capturedImageUri: Uri? = null
         private set
 
+    fun showAppInfoMessage() {
+        uiActionChannel.sendIn(ClassificationUiAction.ShowAppInfoMessage, viewModelScope)
+    }
+
     fun openGallery() {
         uiActionChannel.sendIn(
             ClassificationUiAction.RequestImagePickerLauncher(

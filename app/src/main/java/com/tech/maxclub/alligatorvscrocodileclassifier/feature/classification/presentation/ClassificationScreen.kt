@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.tech.maxclub.alligatorvscrocodileclassifier.BuildConfig
 import com.tech.maxclub.alligatorvscrocodileclassifier.R
 import com.tech.maxclub.alligatorvscrocodileclassifier.feature.classification.presentation.components.CameraPermissionRationaleDialog
 import com.tech.maxclub.alligatorvscrocodileclassifier.feature.classification.presentation.components.ClassificationErrorComponent
@@ -94,6 +96,14 @@ fun ClassificationScreen(
     LaunchedEffect(true) {
         viewModel.uiAction.collectLatest { action ->
             when (action) {
+                is ClassificationUiAction.ShowAppInfoMessage -> {
+                    Toast.makeText(
+                        context,
+                        "${context.getString(R.string.app_name)} v${BuildConfig.VERSION_NAME}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
                 is ClassificationUiAction.ShowImageLoadingErrorMessage -> {
                     snackbarHostState.showSnackbar(
                         message = context.getString(R.string.image_loading_error_message),
@@ -154,7 +164,10 @@ fun ClassificationScreen(
 
     Scaffold(
         topBar = {
-            ClassificationTopAppBar(onClickInfo = onNavigateToScreenByUrl)
+            ClassificationTopAppBar(
+                onClickLogo = viewModel::showAppInfoMessage,
+                onClickInfo = onNavigateToScreenByUrl,
+            )
         },
         floatingActionButton = {
             SelectImageFab(
