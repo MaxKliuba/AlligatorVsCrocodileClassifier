@@ -11,12 +11,14 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tech.maxclub.alligatorvscrocodileclassifier.BuildConfig
+import com.tech.maxclub.alligatorvscrocodileclassifier.core.utils.clearExternalCacheDir
 import com.tech.maxclub.alligatorvscrocodileclassifier.core.utils.createImageFile
 import com.tech.maxclub.alligatorvscrocodileclassifier.core.utils.sendIn
 import com.tech.maxclub.alligatorvscrocodileclassifier.core.utils.update
 import com.tech.maxclub.alligatorvscrocodileclassifier.feature.classification.domain.AlligatorCrocodileClassifier
 import com.tech.maxclub.alligatorvscrocodileclassifier.feature.classification.domain.ClassificationException
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -24,6 +26,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ClassificationViewModel @Inject constructor(
+    @ApplicationContext context: Context,
     private val alligatorCrocodileClassifier: AlligatorCrocodileClassifier,
 ) : ViewModel() {
 
@@ -37,6 +40,10 @@ class ClassificationViewModel @Inject constructor(
 
     var capturedImageUri: Uri? = null
         private set
+
+    init {
+        context.clearExternalCacheDir()
+    }
 
     fun showAppInfoMessage() {
         uiActionChannel.sendIn(ClassificationUiAction.ShowAppInfoMessage, viewModelScope)
