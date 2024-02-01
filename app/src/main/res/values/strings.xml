@@ -1,12 +1,12 @@
 <resources>
-    <string name="app_name">Alligator vs Crocodile Classifier</string>
+    <string name="app_name">Alligators vs Crocodiles</string>
 
     <string name="alligator_label">Alligator</string>
     <string name="crocodile_label">Crocodile</string>
     <string name="alligator_details">https://en.wikipedia.org/wiki/Alligator</string>
     <string name="crocodile_details">https://en.wikipedia.org/wiki/Crocodile</string>
 
-    <string name="classification_title">Alligator vs Crocodile</string>
+    <string name="classification_title">Alligator or Crocodile?</string>
     <string name="info_button">Info</string>
     <string name="info_details">https://en.wikipedia.org/wiki/Crocodilia</string>
     <string name="camera_button">Camera</string>

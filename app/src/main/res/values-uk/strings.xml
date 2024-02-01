@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Алігатори проти Крокодилів</string>
+
+    <string name="alligator_label">Алігатор</string>
+    <string name="crocodile_label">Крокодил</string>
+    <string name="alligator_details">https://uk.wikipedia.org/wiki/%D0%90%D0%BB%D1%96%D0%B3%D0%B0%D1%82%D0%BE%D1%80</string>
+    <string name="crocodile_details">https://uk.wikipedia.org/wiki/%D0%9A%D1%80%D0%BE%D0%BA%D0%BE%D0%B4%D0%B8%D0%BB</string>
+
+    <string name="classification_title">Алігатор чи Крокодил?</string>
+    <string name="info_button">Інформація</string>
+    <string name="info_details">https://uk.wikipedia.org/wiki/%D0%9A%D1%80%D0%BE%D0%BA%D0%BE%D0%B4%D0%B8%D0%BB%D0%BE%D0%BF%D0%BE%D0%B4%D1%96%D0%B1%D0%BD%D1%96_(%D1%80%D1%8F%D0%B4)</string>
+    <string name="camera_button">Камера</string>
+    <string name="gallery_button">Галерея</string>
+    <string name="select_button">Вибрати</string>
+    <string name="camera_is_unavailable_message">Камера недоступна.</string>
+    <string name="camera_permission_dialog_title">Цей застосунок хоче використовувати камеру</string>
+    <string name="camera_permission_dialog_text">Використовується для фотографування.</string>
+    <string name="allow_in_settings_button">Дозволити у Налаштуваннях</string>
+    <string name="no_image_selected_text">Зображення не вибрано</string>
+    <string name="selected_image">Вибране зображення</string>
+    <string name="image_loading_error_message">Не вдалося завантажити зображення.</string>
+    <string name="retry_button">Повторити</string>
+    <string name="read_for_details_button">Докладніше</string>
+    <string name="classification_error_text">Помилка класифікації</string>
+    <string name="try_again_button">Спробувати знову</string>
+</resources>
